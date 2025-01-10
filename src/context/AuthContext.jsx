@@ -1,37 +1,52 @@
-import axios from 'axios';
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
-// 1) On crée le contexte
 const AuthContext = createContext();
 
-// 2) On crée le Provider qui va envelopper l'appli
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Simule un login asynchrone
+  // On lit une fois le localStorage pour initialiser l'état.
+  const storedCredentials = localStorage.getItem('basicAuth');
+  const initialAuth = Boolean(storedCredentials);
+
+  const [isAuthenticated, setIsAuthenticated] = useState(initialAuth);
+
+
+  /**
+   * Tentative de login en Basic Auth
+   */
   const login = async (username, password) => {
     try {
+      // Encodage en Base64
       const credentials = btoa(`${username}:${password}`);
+
+      // Appel à la route d'authentification
       const response = await fetch('/api/users/login', {
         method: 'POST',
         headers: {
-          'Authorization': `Basic ${credentials}`,
+          Authorization: `Basic ${credentials}`,
         },
       });
 
       if (response.ok) {
+        // Si le serveur valide, on stocke les credentials dans localStorage
+        localStorage.setItem('basicAuth', credentials);
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
-        throw new Error('Echec de connexion');
+        throw new Error('Échec de connexion');
       }
     } catch (error) {
       console.error('Erreur de connexion :', error);
+      setIsAuthenticated(false);
       throw error;
     }
   };
 
+  /**
+   * Déconnexion => supprimer du localStorage
+   */
   const logout = () => {
+    localStorage.removeItem('basicAuth');
     setIsAuthenticated(false);
   };
 
@@ -48,7 +63,9 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// 3) Un hook custom pour utiliser plus facilement le contexte
+/**
+ * Hook custom pour utiliser plus facilement le contexte
+ */
 export const useAuth = () => {
   return useContext(AuthContext);
 };
