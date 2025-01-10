@@ -6,8 +6,12 @@ import LoginPage from './components/LoginPage';
 import { useAuth } from './context/AuthContext';
 
 function App() {
-  const {isAuthenticated} = useAuth();
+  const {isAuthenticated,logout} = useAuth();
   const [activeTab, setActiveTab] = useState('posts');
+
+  const handleLogout = () => {
+    logout();
+  }
 
   return (
     <Router>
@@ -22,6 +26,19 @@ function App() {
             element={
               isAuthenticated ? (
                 <div className="container mx-auto px-4 py-8">
+
+                  {/* Bouton de déconnexion */}
+                  <div className="flex justify-end mb-4">
+                    <button
+                      onClick={handleLogout}
+                      className="px-4 py-2 bg-red-500 text-white rounded-md"
+                    >
+                      Se Déconnecter
+                    </button>
+                  </div>
+
+
+
                   <h1 className="text-3xl font-bold text-center mb-8">Dashboard</h1>
                   {/* Onglets */}
                   <div className="flex justify-center space-x-4 mb-8">
