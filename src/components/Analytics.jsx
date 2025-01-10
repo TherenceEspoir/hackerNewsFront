@@ -190,6 +190,8 @@ const Analytics = () => {
     return { yearlyData, monthlyData };
   };
 
+  
+
   return (
     <div className="w-full h-full bg-white rounded-lg p-4">
       <svg

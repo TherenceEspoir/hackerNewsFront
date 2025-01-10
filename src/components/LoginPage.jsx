@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom'; // Import du hook useNavigate
 
 const LoginPage = () => {
@@ -13,7 +13,7 @@ const LoginPage = () => {
     try {
       await login(username, password);
       // Rediriger vers la page d'accueil après connexion réussie
-      navigate('/');
+      navigate('/posts');
     } catch (error) {
       console.error('Erreur de connexion :', error);
       // Afficher un message d'erreur à l'utilisateur
@@ -22,9 +22,13 @@ const LoginPage = () => {
   };
 
   // Si l'utilisateur est déjà authentifié, le rediriger vers la page d'accueil
+  
+  /*
   if (isAuthenticated) {
-    navigate('/');
+    navigate('/posts');
   }
+  */
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
