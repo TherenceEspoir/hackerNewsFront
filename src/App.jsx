@@ -31,12 +31,12 @@ function App() {
                   <div className="flex justify-end mb-4">
                     <button
                       onClick={handleLogout}
-                      className="px-4 py-2 bg-red-500 text-white rounded-md"
+                      className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md 
+                                 hover:bg-gray-400 transition duration-300"
                     >
                       Se Déconnecter
                     </button>
                   </div>
-
 
 
                   <h1 className="text-3xl font-bold text-center mb-8">Dashboard</h1>

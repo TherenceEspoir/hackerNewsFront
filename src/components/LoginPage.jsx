@@ -21,14 +21,6 @@ const LoginPage = () => {
     }
   };
 
-  // Si l'utilisateur est déjà authentifié, le rediriger vers la page d'accueil
-  
-  /*
-  if (isAuthenticated) {
-    navigate('/posts');
-  }
-  */
-  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
