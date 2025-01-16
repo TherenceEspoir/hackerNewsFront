@@ -42,6 +42,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+
+  const signup = async (username, password) => {
+    try {
+
+      const credentials = btoa(`${username}:${password}`);
+      const response = await fetch('/api/users?username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+
+        localStorage.setItem('basicAuth', credentials);
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        throw new Error('Échec d\'inscription');
+      }
+    } catch (error) {
+      console.error('Erreur d\'inscription :', error);
+      setIsAuthenticated(false);
+      throw error;
+    }
+  };
+
+
   /**
    * Déconnexion => supprimer du localStorage
    */
@@ -56,6 +84,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         login,
         logout,
+        signup,
       }}
     >
       {children}

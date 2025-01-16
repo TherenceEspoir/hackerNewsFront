@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link ,Navigate} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
 import PostsList from './components/PostList';
 import Analytics from './components/Analytics';
 import LoginPage from './components/LoginPage';
+import SignupPage from './components/SignupPage'; // <-- IMPORTER ta page d'inscription
 import { useAuth } from './context/AuthContext';
 
 function App() {
-  const {isAuthenticated,logout} = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('posts');
 
   const handleLogout = () => {
     logout();
-  }
+  };
 
   return (
     <Router>
@@ -20,13 +21,15 @@ function App() {
           {/* Page de login sur "/" */}
           <Route path="/" element={<LoginPage />} />
 
+          {/* Page d'inscription sur "/signup" */}
+          <Route path="/signup" element={<SignupPage />} />
+
           {/* "/posts" => protégé */}
           <Route
             path="/posts"
             element={
               isAuthenticated ? (
                 <div className="container mx-auto px-4 py-8">
-
                   {/* Bouton de déconnexion */}
                   <div className="flex justify-end mb-4">
                     <button
@@ -37,7 +40,6 @@ function App() {
                       Se Déconnecter
                     </button>
                   </div>
-
 
                   <h1 className="text-3xl font-bold text-center mb-8">Dashboard</h1>
                   {/* Onglets */}
@@ -65,7 +67,6 @@ function App() {
                   <PostsList />
                 </div>
               ) : (
-                // Si pas authentifié, on redirige vers "/"
                 <Navigate to="/" />
               )
             }
