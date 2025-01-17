@@ -9,15 +9,17 @@ const Analytics = () => {
   //   "2017": { "JANUARY":2, "FEBRUARY":6, ... },
   //    ...
   // }
-  const { postAnalytics } = usePosts();
+  const { postAnalytics,postAnalyticsByType } = usePosts();
 
-  const svgRef = useRef(null);
+  const svgRefBar = useRef(null);
+  const svgRefPie = useRef(null);
+
   const [selectedYear, setSelectedYear] = useState(null);
 
   useEffect(() => {
     if (!postAnalytics) return; // si pas encore chargé, on sort
 
-    const svg = d3.select(svgRef.current);
+    const svg = d3.select(svgRefBar.current);
     svg.selectAll('*').remove(); // reset du contenu
 
     const margin = { top: 40, right: 40, bottom: 80, left: 60 };
@@ -148,14 +150,106 @@ const Analytics = () => {
 
   }, [postAnalytics, selectedYear]);
 
+  useEffect(() => {
+    if (!postAnalyticsByType) return; // Attendre que les données soient chargées
+
+    // --- Diagramme en Secteurs pour les Posts par Type ---
+    const svgPie = d3.select(svgRefPie.current);
+    svgPie.selectAll('*').remove(); // Réinitialiser le contenu
+
+    const widthPie = 400;
+    const heightPie = 400;
+    const marginPie = 40;
+
+    const radius = Math.min(widthPie, heightPie) / 2 - marginPie;
+
+    const gPie = svgPie
+      .append('g')
+      .attr('transform', `translate(${widthPie / 2},${heightPie / 2})`);
+
+    const data = postAnalyticsByType; // { "Type1": 10, "Type2": 20, ... }
+
+    const color = d3.scaleOrdinal()
+      .domain(Object.keys(data))
+      .range(d3.schemeCategory10);
+
+    const pie = d3.pie()
+      .sort(null)
+      .value(d => d[1]);
+
+    const data_ready = pie(Object.entries(data));
+
+    const arc = d3.arc()
+      .innerRadius(0)         // Pour un pie chart
+      .outerRadius(radius);
+      // Pour un donut chart, définissez innerRadius à une valeur > 0, par ex :
+      // .innerRadius(radius * 0.5)
+
+    // Dessiner les secteurs
+    gPie.selectAll('path')
+      .data(data_ready)
+      .enter()
+      .append('path')
+        .attr('d', arc)
+        .attr('fill', d => color(d.data[0]))
+        .attr('stroke', 'white')
+        .style('stroke-width', '2px')
+        .style('opacity', 0.7)
+      .on('mouseover', function(event, d) {
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .style('opacity', 1);
+      })
+      .on('mouseout', function(event, d) {
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .style('opacity', 0.7);
+      });
+
+    // Ajouter les étiquettes
+    gPie.selectAll('text')
+      .data(data_ready)
+      .enter()
+      .append('text')
+        .text(d => `${d.data[0]} (${d.data[1]})`)
+        .attr('transform', d => `translate(${arc.centroid(d)})`)
+        .style('text-anchor', 'middle')
+        .style('font-size', '12px');
+
+    // Titre
+    svgPie.append('text')
+      .attr('x', widthPie / 2)
+      .attr('y', marginPie / 2)
+      .attr('text-anchor', 'middle')
+      .style('font-size', '16px')
+      .style('font-weight', 'bold')
+      .text('Posts par Type');
+
+  }, [postAnalyticsByType]);
+
   return (
-    <div className="w-full h-full bg-white rounded-lg p-4">
-      <svg
-        ref={svgRef}
-        className="w-full h-full"
-        viewBox="0 0 800 400"
-        preserveAspectRatio="xMidYMid meet"
-      />
+    <div className="w-full h-full bg-white rounded-lg p-4 flex flex-col space-y-8">
+      {/* Graphique en Barres */}
+      <div className="w-full">
+        <svg
+          ref={svgRefBar}
+          className="w-full h-full"
+          viewBox="0 0 800 400"
+          preserveAspectRatio="xMidYMid meet"
+        />
+      </div>
+
+      {/* Graphique en Secteurs */}
+      <div className="w-full flex justify-center">
+        <svg
+          ref={svgRefPie}
+          className="w-96 h-96"
+          viewBox="0 0 400 400"
+          preserveAspectRatio="xMidYMid meet"
+        />
+      </div>
     </div>
   );
 };
